@@ -1,141 +1,145 @@
-# Development of an Artificial Neural Network (ANN) for Binary Classification Using the `make_moons` Dataset
+# Development of an Artificial Neural Network (ANN) for Binary Classification Using the Make Moons Dataset
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.15%2B-orange.svg)](https://www.tensorflow.org/)
 [![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.2%2B-green.svg)](https://scikit-learn.org/)
-[![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kit2824bam007-lab/Development-of-an-Artificial-Neural-Network-ANN-for-Binary-Classification-/blob/main/ANN_Binary_Classification_using_the_Make_Moons_Dataset.ipynb)
 
 ---
 
 ## 📌 Project Overview
-This repository contains a complete, beginner-friendly, and production-grade implementation of an **Artificial Neural Network (ANN)** designed to solve a non-linear binary classification problem using the synthetic **`make_moons`** dataset from **Scikit-learn**.
+This repository implements an end-to-end **Artificial Neural Network (ANN / Multi-Layer Perceptron)** for binary classification on the non-linearly separable **`make_moons`** dataset from Scikit-Learn.
 
-While single-layer perceptrons or simple logistic regression models fail when decision surfaces are non-linear, a Multi-Layer Perceptron (MLP) equipped with non-linear activation functions (ReLU & Sigmoid) successfully projects input features into a latent representation where the two interlocking crescent moons become cleanly separable.
+Linear models (such as linear SVMs or Logistic Regression without polynomial kernels) cannot solve classification problems with non-linear decision boundaries. By introducing a multi-layer architecture with non-linear activation functions (**ReLU** for hidden feature projection and **Sigmoid** for probability estimation), this network maps the two-dimensional input space into a latent representation where the two interlocking crescent moons are cleanly separated with **98.00% test accuracy** and a **0.9981 ROC-AUC score**.
 
 ---
 
-## 🎯 Project Objectives
-1. **Dataset Synthesis:** Generate 1,000 samples of interlocking non-linear crescent moons using `make_moons` with Gaussian noise ($\sigma = 0.2$).
-2. **Data Preprocessing:** Implement stratified 80:20 train-test splitting and Z-score feature standardization (`StandardScaler`).
-3. **ANN Architecture:** Construct a sequential neural network in TensorFlow/Keras with 2 input features, two hidden layers (16 and 8 units with ReLU activations), and a single sigmoid output neuron.
-4. **Model Training:** Train for 100 epochs with Adam optimizer ($\eta = 0.01$) and Binary Cross-Entropy loss, tracking training and validation trajectories.
-5. **Model Evaluation:** Measure real test metrics (Accuracy, Precision, Recall, F1-Score, and Confusion Matrix).
-6. **Decision Boundary Visualization:** Generate a 2D probability contour map overlaid with empirical data points to visualize non-linear decision surface geometry.
-7. **Empirical Analysis:** Provide comprehensive scientific conclusions suitable for a university machine learning mini-project.
+## 🎯 Key Objectives & Workflow
+1. **Synthetic Data Synthesis:** Generate $N = 1{,}000$ samples across two interleaved semi-circles with realistic Gaussian noise ($\sigma = 0.25$) and reproducible seed (`random_state=42`).
+2. **Exploratory Data Analysis:** Visualize the crescent geometry and verify balanced class distributions ($500$ samples per class).
+3. **Data Splitting & Preprocessing:** Apply an 80/20 stratified split and fit a `StandardScaler` strictly on the training set to prevent data leakage.
+4. **Deep Architecture Design:** Construct a sequential Multi-Layer Perceptron with Keras:
+   - Input layer ($d = 2$)
+   - Hidden Layer 1 ($16$ units, ReLU activation)
+   - Hidden Layer 2 ($8$ units, ReLU activation)
+   - Output Layer ($1$ unit, Sigmoid activation)
+5. **Regularized Optimization:** Train using the **Adam** optimizer ($\eta = 0.01$) and **Binary Cross-Entropy** loss, utilizing **Early Stopping** with validation patience ($p = 15$) and automatic restoration of best weights.
+6. **Comprehensive Model Evaluation:** Assess test metrics, including Accuracy, ROC-AUC, Precision, Recall, F1-Score, Confusion Matrix, and 2D Decision Boundary contours.
+7. **Single-Sample Inference:** Demonstrate production-style inference pipeline on arbitrary feature coordinates.
 
 ---
 
 ## 📂 Repository Structure
 ```text
-ANN PROJECT/
-│
-├── main.py                             # Complete, executable Python script (all 7 steps)
-├── ANN_Make_Moons_Classification.ipynb # Jupyter/Colab notebook with markdown & cells
-├── requirements.txt                    # Project dependencies specification
-├── build_notebook.py                   # Automation script for notebook generation
-├── README.md                           # Quickstart guide and summary
-├── PROJECT_REPORT.md                   # Full academic report for college submission
-│
-├── dataset_visualization.png           # Scatter plot of Class 0 vs Class 1
-├── training_history.png                # Loss and Accuracy curves vs. Epochs
-├── confusion_matrix.png                # Heatmap of test predictions vs ground truth
-└── decision_boundary.png               # Learned probability manifold & threshold
+Development-of-an-Artificial-Neural-Network-ANN-for-Binary-Classification-/
+├── ANN_Binary_Classification_using_the_Make_Moons_Dataset.ipynb  # Complete interactive Jupyter notebook
+├── requirements.txt                                              # Project dependencies
+├── .gitignore                                                    # Standard Git exclusions
+└── README.md                                                     # Comprehensive project documentation
 ```
 
 ---
 
-## 🚀 Quickstart & Execution
+## 🔬 ANN Architecture & Parameter Analysis
 
-### 1. Clone or Open the Workspace
-```bash
-cd "c:/Users/hp/ANN PROJECT"
+The model contains **193 trainable parameters** structured as follows:
+
+| Layer | Type | Input Dimension | Output Units | Activation | Param Calculation | Parameters (#) |
+| :--- | :--- | :---: | :---: | :---: | :--- | :---: |
+| **Input** | `InputLayer` | `(None, 2)` | `(None, 2)` | — | — | 0 |
+| **Hidden Layer 1** | `Dense` | `(None, 2)` | `(None, 16)` | ReLU | $(2 \times 16) + 16$ | 48 |
+| **Hidden Layer 2** | `Dense` | `(None, 16)` | `(None, 8)` | ReLU | $(16 \times 8) + 8$ | 136 |
+| **Output Layer** | `Dense` | `(None, 8)` | `(None, 1)` | Sigmoid | $(8 \times 1) + 1$ | 9 |
+| **Total** | | | | | | **193** |
+
+### Mathematical Formulation
+For input $\mathbf{x} \in \mathbb{R}^2$:
+$$\mathbf{h}_1 = \text{ReLU}(\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1), \quad \mathbf{W}_1 \in \mathbb{R}^{16 \times 2}, \mathbf{b}_1 \in \mathbb{R}^{16}$$
+$$\mathbf{h}_2 = \text{ReLU}(\mathbf{W}_2 \mathbf{h}_1 + \mathbf{b}_2), \quad \mathbf{W}_2 \in \mathbb{R}^{8 \times 16}, \mathbf{b}_2 \in \mathbb{R}^{8}$$
+$$\hat{y} = \sigma(\mathbf{W}_3 \mathbf{h}_2 + b_3), \quad \mathbf{W}_3 \in \mathbb{R}^{1 \times 8}, b_3 \in \mathbb{R}$$
+$$\mathcal{L}(y, \hat{y}) = - \Big[ y \log(\hat{y}) + (1 - y) \log(1 - \hat{y}) \Big]$$
+
+---
+
+## 📊 Experimental Results
+
+Evaluated on 200 hold-out test samples (100 samples per class):
+
+| Metric | Measured Value | Benchmark Interpretation |
+| :--- | :---: | :--- |
+| **Test Accuracy** | **98.00%** | 196 out of 200 test points correctly classified |
+| **Test Loss** | **0.0949** | Stable, low binary cross-entropy loss |
+| **ROC-AUC Score** | **0.9981** | Near-perfect discriminatory capability across all probability thresholds |
+| **Class 0 Precision / Recall / F1** | **0.98 / 0.98 / 0.98** | Highly balanced performance with negligible false alarms |
+| **Class 1 Precision / Recall / F1** | **0.98 / 0.98 / 0.98** | High sensitivity on interlocking crescent points |
+
+### Classification Report
+```text
+              precision    recall  f1-score   support
+
+           0       0.98      0.98      0.98       100
+           1       0.98      0.98      0.98       100
+
+    accuracy                           0.98       200
+   macro avg       0.98      0.98      0.98       200
+weighted avg       0.98      0.98      0.98       200
 ```
 
-### 2. Install Dependencies
+---
+
+## 🚀 Installation & Execution
+
+### 1. Prerequisites
+Ensure you have Python 3.10+ installed.
+
+### 2. Clone the Repository
 ```bash
+git clone https://github.com/kit2824bam007-lab/Development-of-an-Artificial-Neural-Network-ANN-for-Binary-Classification-.git
+cd Development-of-an-Artificial-Neural-Network-ANN-for-Binary-Classification-
+```
+
+### 3. Create a Virtual Environment & Install Dependencies
+```bash
+python -m venv venv
+
+# On Windows:
+venv\Scripts\activate
+
+# On Linux/macOS:
+source venv/bin/activate
+
+# Install required packages:
 pip install -r requirements.txt
 ```
 
-### 3. Run the Standalone Script
+### 4. Run the Notebook
+Launch Jupyter Notebook or JupyterLab:
 ```bash
-python main.py
+jupyter notebook ANN_Binary_Classification_using_the_Make_Moons_Dataset.ipynb
 ```
-*This command executes the entire pipeline, prints console diagnostics, and saves all four visualization figures to the project root.*
-
-### 4. Open in Jupyter Notebook or Google Colab
-Launch the interactive notebook:
-```bash
-jupyter notebook ANN_Make_Moons_Classification.ipynb
-```
-Or upload `ANN_Make_Moons_Classification.ipynb` directly into [Google Colab](https://colab.research.google.com/).
+Or open the notebook directly in [Google Colab](https://colab.research.google.com/github/kit2824bam007-lab/Development-of-an-Artificial-Neural-Network-ANN-for-Binary-Classification-/blob/main/ANN_Binary_Classification_using_the_Make_Moons_Dataset.ipynb).
 
 ---
 
-## 📊 Empirical Results Summary
+## 📈 Step-by-Step Pipeline in the Notebook
 
-Trained with a fixed seed (`random_state=42`), the ANN achieved the following test metrics on 200 unseen samples:
-
-| Metric | Measured Value | Description / Interpretation |
-| :--- | :---: | :--- |
-| **Test Accuracy** | **99.50%** | 199 out of 200 test samples correctly classified |
-| **Test Loss** | **0.0325** | Low binary cross-entropy loss, indicating high confidence |
-| **Precision** | **0.9901** | Ratio of true positive moon instances over predicted positives |
-| **Recall** | **1.0000** | 100% of actual Class 1 samples identified without false negatives |
-| **F1-Score** | **0.9950** | Harmonic mean of precision and recall |
-
-### Detailed Classification Report
-```text
-                  precision    recall  f1-score   support
-
-Class 0 (Moon A)       1.00      0.99      0.99       100
-Class 1 (Moon B)       0.99      1.00      1.00       100
-
-        accuracy                           0.99       200
-       macro avg       1.00      0.99      0.99       200
-    weighted avg       1.00      0.99      0.99       200
-```
+| Step | Section | Description |
+| :---: | :--- | :--- |
+| **01** | **Library Imports** | Imports TensorFlow, Scikit-learn, NumPy, and Matplotlib. |
+| **02** | **Data Generation** | Synthesizes 1,000 samples using `make_moons(noise=0.25)`. |
+| **03** | **Data Visualization** | Plots raw feature scatter diagram with color-coded classes. |
+| **04** | **Data Splitting** | Stratified 80/20 train/test partition ($N_{\text{train}} = 800, N_{\text{test}} = 200$). |
+| **05** | **Feature Scaling** | Standardizes features to zero mean and unit variance via `StandardScaler`. |
+| **06** | **Model Architecture** | Defines sequential 2-layer MLP (16-8-1 neurons) with Adam and BCE loss. |
+| **07** | **Model Training** | Fits for up to 200 epochs with Early Stopping ($patience=15$). |
+| **08** | **Training Curves** | Visualizes training and validation accuracy and loss evolution. |
+| **09** | **Model Evaluation** | Computes test loss, test accuracy (98%), ROC-AUC (0.9981), and classification report. |
+| **10** | **Confusion Matrix** | Plots confusion matrix with `ConfusionMatrixDisplay`. |
+| **11** | **Decision Boundary** | Evaluates a dense 2D grid ($300 \times 300$) and draws probability contours. |
+| **12** | **Sample Inference** | Runs prediction on a novel data point $[0.5, 0.2]$ outputting class probability. |
 
 ---
 
-## 🖼️ Visualizations & Analysis
-
-### 1. Dataset Generation (`dataset_visualization.png`)
-The `make_moons` synthetic dataset with noise $\sigma = 0.2$ creates two interleaving crescents that cannot be partitioned by a single linear hyperplane.
-![Dataset Visualization](dataset_visualization.png)
-
-### 2. Training Trajectory (`training_history.png`)
-Both training and validation loss decay rapidly within the first 20 epochs and stabilize by epoch 50. Validation accuracy climbs from ~90% to 99.50% without divergence or severe overfitting.
-![Training History](training_history.png)
-
-### 3. Confusion Matrix (`confusion_matrix.png`)
-On 200 unseen test instances (100 Class 0, 100 Class 1), the model achieved 99 True Negatives, 100 True Positives, 1 False Positive, and 0 False Negatives.
-![Confusion Matrix](confusion_matrix.png)
-
-### 4. Learned Decision Boundary (`decision_boundary.png`)
-The decision threshold line ($P = 0.5$, dashed black curve) snakes between the two crescent clusters, validating the model's non-linear separation capability.
-![Decision Boundary](decision_boundary.png)
-
----
-
-## 🔬 Architectural Parameter Breakdown
-
-```text
-Model: "Moons_Binary_Classifier_ANN"
-_________________________________________________________________
- Layer (type)                Output Shape              Param #   
-=================================================================
- Input_Layer (InputLayer)    (None, 2)                 0         
- Hidden_Layer_1 (Dense)      (None, 16)                48        
- Hidden_Layer_2 (Dense)      (None, 8)                 136       
- Output_Layer (Dense)        (None, 1)                 9         
-=================================================================
-Total params: 193 (772.00 B)
-Trainable params: 193 (772.00 B)
-Non-trainable params: 0 (0.00 B)
-_________________________________________________________________
-```
-
-- **Hidden Layer 1:** $(2 \text{ inputs} \times 16 \text{ neurons}) + 16 \text{ biases} = 48$ weights.
-- **Hidden Layer 2:** $(16 \text{ inputs} \times 8 \text{ neurons}) + 8 \text{ biases} = 136$ weights.
-- **Output Layer:** $(8 \text{ inputs} \times 1 \text{ neuron}) + 1 \text{ bias} = 9$ weights.
-- **Total Trainable Parameters:** 193 parameters.
+## 📄 License
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
